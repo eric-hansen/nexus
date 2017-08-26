@@ -1,0 +1,154 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "version" : "0.0.1",
+    "title" : "Nexus"
+  },
+  "host" : "localhost:10010",
+  "basePath" : "/",
+  "schemes" : [ "http", "https" ],
+  "consumes" : [ "application/json", "application/x-www-form-urlencoded" ],
+  "produces" : [ "application/json" ],
+  "paths" : {
+    "/token/validate" : {
+      "get" : {
+        "tags" : [ "JWT" ],
+        "description" : "Validate the JWT token",
+        "operationId" : "validate",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "JWT token is still valid",
+            "schema" : {
+              "type" : "string"
+            }
+          },
+          "403" : {
+            "description" : "JWT token is not valid",
+            "schema" : {
+              "$ref" : "#/definitions/JWTUnauthroizedResponse"
+            }
+          }
+        },
+        "security" : [ {
+          "Bearer" : [ ]
+        } ]
+      },
+      "x-swagger-router-controller" : "jwt"
+    },
+    "/token" : {
+      "post" : {
+        "tags" : [ "JWT" ],
+        "description" : "Fetch JWT token",
+        "operationId" : "fetch",
+        "consumes" : [ "application/x-www-form-urlencoded" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "credentials",
+          "description" : "Authentication information",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/LoginRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Success",
+            "schema" : {
+              "$ref" : "#/definitions/JWTFetchResponse"
+            }
+          },
+          "default" : {
+            "description" : "Error",
+            "schema" : {
+              "$ref" : "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "x-swagger-router-controller" : "jwt"
+    },
+    "/heartbeat" : {
+      "get" : {
+        "tags" : [ "System Management" ],
+        "description" : "Heartbeat to ensure server is alive",
+        "operationId" : "ok",
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Success",
+            "schema" : {
+              "$ref" : "#/definitions/HeartbeatResponse"
+            }
+          },
+          "default" : {
+            "description" : "Error",
+            "schema" : {
+              "$ref" : "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "x-swagger-router-controller" : "heartbeat"
+    },
+    "/swagger" : {
+      "x-swagger-pipe" : "swagger_raw"
+    }
+  },
+  "securityDefinitions" : {
+    "Bearer" : {
+      "type" : "apiKey",
+      "name" : "Authorization",
+      "in" : "header"
+    }
+  },
+  "definitions" : {
+    "LoginRequest" : {
+      "properties" : {
+        "username" : {
+          "type" : "string"
+        },
+        "password" : {
+          "type" : "string"
+        }
+      }
+    },
+    "JWTUnauthroizedResponse" : {
+      "properties" : {
+        "message" : {
+          "type" : "string"
+        },
+        "code" : {
+          "type" : "string"
+        },
+        "statusCode" : {
+          "type" : "integer"
+        }
+      }
+    },
+    "JWTFetchResponse" : {
+      "properties" : {
+        "token" : {
+          "type" : "string"
+        }
+      }
+    },
+    "HeartbeatResponse" : {
+      "properties" : {
+        "message" : {
+          "type" : "string"
+        }
+      }
+    },
+    "ErrorResponse" : {
+      "required" : [ "message" ],
+      "properties" : {
+        "message" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}
